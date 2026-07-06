@@ -25,9 +25,17 @@ def health_check():
 
 @app.get("/test-db")
 def test_db():
-    response = supabase.table("leads").select("*").limit(5).execute()
+    try:
+        response = supabase.table("leads").select("*").limit(5).execute()
 
-    return {
-        "message": "Supabase connected successfully",
-        "data": response.data
-    }
+        return {
+            "message": "Supabase connected successfully",
+            "data": response.data,
+        }
+
+    except Exception as e:
+        return {
+            "message": "Supabase connection failed",
+            "error": str(e),
+            "hint": "Check backend/.env. SUPABASE_URL must look like https://project-id.supabase.co and should not include /rest/v1/. Use sb_publishable key, not sb_secret.",
+        }
