@@ -1,9 +1,21 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.db import supabase
 from app.routers import leads
 from app.routers import demo
 
 app = FastAPI(title="LexiVoice Intake API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(leads.router, prefix="/leads", tags=["Leads"])
 app.include_router(demo.router, prefix="/demo", tags=["Demo"])
