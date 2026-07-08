@@ -21,6 +21,4 @@ It helps law firms automate inbound client intake using:
 - Retell AI / Twilio trial
 - ngrok
 
-## Note
 
-This is a portfolio demo project and is not intended for production legal use without compliance review.
