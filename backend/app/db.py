@@ -11,6 +11,7 @@ load_dotenv(dotenv_path=ENV_PATH)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "").strip()
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "").strip()
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
 
 # Remove accidental REST API path if included
 if SUPABASE_URL.endswith("/rest/v1/"):
@@ -39,4 +40,9 @@ if not SUPABASE_ANON_KEY:
 print(f"Loaded Supabase URL: {SUPABASE_URL}")
 print(f"Loaded Supabase key prefix: {SUPABASE_ANON_KEY[:15]}...")
 
+# Use service role key for admin operations (bypasses RLS), fallback to anon key
+admin_key = SUPABASE_SERVICE_ROLE_KEY if SUPABASE_SERVICE_ROLE_KEY else SUPABASE_ANON_KEY
+print(f"Using {'service role' if SUPABASE_SERVICE_ROLE_KEY else 'anon'} key for admin operations")
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+supabase_admin: Client = create_client(SUPABASE_URL, admin_key)

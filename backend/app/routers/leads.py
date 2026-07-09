@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-from app.db import supabase
+from app.db import supabase, supabase_admin
 
 router = APIRouter()
 
@@ -21,7 +21,8 @@ class LeadCreate(BaseModel):
 @router.post("/")
 def create_lead(lead: LeadCreate):
     try:
-        response = supabase.table("leads").insert(lead.model_dump()).execute()
+        # Use admin client to bypass RLS policies
+        response = supabase_admin.table("leads").insert(lead.model_dump()).execute()
 
         return {
             "message": "Lead created successfully",
