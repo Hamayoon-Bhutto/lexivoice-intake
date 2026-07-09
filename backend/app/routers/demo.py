@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from app.db import supabase
+from app.db import supabase, supabase_admin
 from app.graph.workflow import run_intake_workflow
 
 
@@ -42,7 +42,7 @@ def simulate_call(call_request: DemoCallRequest):
             "origin_channel": "demo_call",
         }
 
-        lead_response = supabase.table("leads").insert(lead_payload).execute()
+        lead_response = supabase_admin.table("leads").insert(lead_payload).execute()
 
         if not getattr(lead_response, "data", None):
             raise HTTPException(status_code=500, detail="Lead creation failed")
@@ -61,7 +61,7 @@ def simulate_call(call_request: DemoCallRequest):
             "recording_url": call_request.recording_url,
         }
 
-        supabase.table("calls").insert(call_payload).execute()
+        supabase_admin.table("calls").insert(call_payload).execute()
 
         document_rows = [
             {
@@ -74,7 +74,7 @@ def simulate_call(call_request: DemoCallRequest):
         ]
 
         if document_rows:
-            supabase.table("documents").insert(document_rows).execute()
+            supabase_admin.table("documents").insert(document_rows).execute()
 
         return {
             "message": "Demo call simulated successfully",
