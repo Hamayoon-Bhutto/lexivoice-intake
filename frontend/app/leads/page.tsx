@@ -40,16 +40,20 @@ export default function LeadsPage() {
   }, []);
 
   async function handleCreateLead(payload: CreateLeadPayload) {
-    await createLead(payload);
-    setSuccess("Prospect cree avec succes.");
-    await loadLeads();
+    try {
+      await createLead(payload);
+      setSuccess("Prospect cree avec succes.");
+      await loadLeads();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors de la creation du prospect.");
+    }
   }
 
   return (
     <AppShell
       title="Prospects"
       actions={
-        <Button onClick={() => setModalOpen(true)}>
+        <Button onClick={() => { setModalOpen(true); setError(null); setSuccess(""); }}>
           <Plus className="h-4 w-4" />
           Nouveau prospect
         </Button>

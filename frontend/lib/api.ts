@@ -24,7 +24,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     try {
       const errorBody = (await response.json()) as { detail?: string; message?: string };
       throw new Error(errorBody.detail || errorBody.message || fallbackMessage);
-    } catch {
+    } catch (parseError) {
+      // If we can't parse the JSON, check if parseError is our thrown Error
+      if (parseError instanceof Error && parseError.message !== fallbackMessage) {
+        throw parseError;
+      }
       throw new Error(fallbackMessage);
     }
   }

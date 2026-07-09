@@ -33,7 +33,7 @@ export function IntakeVolumeChart({ data }: { data: IntakePoint[] }) {
             <YAxis tick={{ fontSize: 12, fill: "#64748B" }} axisLine={false} tickLine={false} />
             <Tooltip
               contentStyle={{ borderRadius: 12, borderColor: "#E2E8F0" }}
-              formatter={(value: number) => [`${value} intakes`, "Volume"]}
+              formatter={(value) => [`${value} intakes`, "Volume"]}
             />
             <Area
               type="monotone"

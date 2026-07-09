@@ -26,15 +26,20 @@ const defaultValues: CreateLeadPayload = {
 export function LeadFormModal({ open, onClose, onSubmit }: LeadFormModalProps) {
   const [form, setForm] = useState<CreateLeadPayload>(defaultValues);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
+    setError(null);
 
     try {
       await onSubmit(form);
       setForm(defaultValues);
+      setError(null);
       onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur s'est produite");
     } finally {
       setSubmitting(false);
     }
@@ -56,6 +61,11 @@ export function LeadFormModal({ open, onClose, onSubmit }: LeadFormModalProps) {
         </>
       }
     >
+      {error && (
+        <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
       <form id="lead-form" className="grid grid-cols-1 gap-3 md:grid-cols-2" onSubmit={handleSubmit}>
         <label className="text-sm text-slate-600">
           Nom complet
