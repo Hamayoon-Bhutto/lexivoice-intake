@@ -7,6 +7,7 @@ import {
   FileWarning,
   FolderPlus,
   PhoneForwarded,
+  RefreshCw,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { StatCard } from "@/components/dashboard/StatCard";
@@ -117,7 +118,7 @@ function bucket(leads: Lead[], key: (lead: Lead) => string | undefined) {
 export default function DashboardPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
   const [simulateOpen, setSimulateOpen] = useState(false);
   const [simulateForm, setSimulateForm] = useState(defaultCallPayload);
   const [simulateLoading, setSimulateLoading] = useState(false);
@@ -126,12 +127,13 @@ export default function DashboardPage() {
 
   async function loadLeads() {
     setLoading(true);
-    setError(null);
+    setError("");
     try {
       const data = await getLeads();
+      console.log("Fetched leads:", data);
       setLeads(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur de chargement.");
+    } catch (err: any) {
+      setError(err.message || "Could not load leads");
     } finally {
       setLoading(false);
     }
@@ -223,7 +225,7 @@ export default function DashboardPage() {
 
   async function onSimulateCallSubmit() {
     setSimulateLoading(true);
-    setError(null);
+    setError("");
 
     try {
       const response = await simulateCall(simulateForm);
@@ -231,8 +233,8 @@ export default function DashboardPage() {
       setSimulateOpen(false);
       setSimulateResult(response);
       await loadLeads();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Echec de simulation.");
+    } catch (err: any) {
+      setError(err.message || "Echec de simulation.");
     } finally {
       setSimulateLoading(false);
     }
@@ -242,10 +244,16 @@ export default function DashboardPage() {
     <AppShell
       title="Tableau de bord"
       actions={
-        <Button onClick={() => setSimulateOpen(true)}>
-          <PhoneForwarded className="h-4 w-4" />
-          Simuler un appel IA
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={loadLeads} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Rafraîchir
+          </Button>
+          <Button onClick={() => setSimulateOpen(true)}>
+            <PhoneForwarded className="h-4 w-4" />
+            Simuler un appel IA
+          </Button>
+        </div>
       }
     >
       {successMessage ? (

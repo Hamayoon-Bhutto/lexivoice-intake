@@ -11,6 +11,7 @@ const API_BASE_URL =
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       ...(init?.headers || {}),
@@ -37,15 +38,33 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export async function getLeads(): Promise<Lead[]> {
-  const data = await request<LeadsApiResponse>("/leads/");
-  return data.data || [];
+  const res = await fetch(`${API_BASE_URL}/leads/`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch leads");
+  }
+
+  const json = (await res.json()) as LeadsApiResponse;
+  return json.data || [];
 }
 
 export async function createLead(payload: CreateLeadPayload): Promise<Lead> {
-  return request<Lead>("/leads/", {
+  const res = await fetch(`${API_BASE_URL}/leads/`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(payload),
   });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "Failed to create lead");
+  }
+
+  return (await res.json()) as Lead;
 }
 
 export async function simulateCall(

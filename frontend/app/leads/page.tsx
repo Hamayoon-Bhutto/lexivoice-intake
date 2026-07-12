@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { LeadTable } from "@/components/leads/LeadTable";
 import { LeadFormModal } from "@/components/leads/LeadFormModal";
@@ -15,19 +15,19 @@ import { CreateLeadPayload, Lead } from "@/lib/types";
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
   const [success, setSuccess] = useState("");
 
   async function loadLeads() {
     setLoading(true);
-    setError(null);
-
+    setError("");
     try {
       const data = await getLeads();
+      console.log("Fetched leads:", data);
       setLeads(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Impossible de charger les prospects.");
+    } catch (err: any) {
+      setError(err.message || "Could not load leads");
     } finally {
       setLoading(false);
     }
@@ -44,8 +44,8 @@ export default function LeadsPage() {
       await createLead(payload);
       setSuccess("Prospect cree avec succes.");
       await loadLeads();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur lors de la creation du prospect.");
+    } catch (err: any) {
+      setError(err.message || "Erreur lors de la creation du prospect.");
     }
   }
 
@@ -53,10 +53,16 @@ export default function LeadsPage() {
     <AppShell
       title="Prospects"
       actions={
-        <Button onClick={() => { setModalOpen(true); setError(null); setSuccess(""); }}>
-          <Plus className="h-4 w-4" />
-          Nouveau prospect
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={loadLeads} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Rafraîchir
+          </Button>
+          <Button onClick={() => { setModalOpen(true); setError(""); setSuccess(""); }}>
+            <Plus className="h-4 w-4" />
+            Nouveau prospect
+          </Button>
+        </div>
       }
     >
       {success ? (
