@@ -19,6 +19,6 @@ It helps law firms automate inbound client intake using:
 - Next.js
 - Tailwind CSS
 - Retell AI / Twilio trial
-- ngrok
+  
 
 
